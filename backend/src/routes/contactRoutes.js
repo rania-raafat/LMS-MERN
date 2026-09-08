@@ -7,8 +7,8 @@ import {
 
 const router = express.Router();
 
-router.post("/contact", createContact);
+router.post("/", createContact);
 
-router.get("/contacts", getContacts);
+router.get("/", getContacts);
 
 export default router;

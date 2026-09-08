@@ -9,6 +9,6 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use("/api", contactRoutes);
+app.use("/api/contacts", contactRoutes);
 
 export default app;
