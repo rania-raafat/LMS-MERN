@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  --background: #f7f5f2;
+  --main-color: #292725;
+  --primary-color: #D97B66;
+  --secondary-color: #5C6BC0;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--background);
+  color: var(--main-color);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+.courses-pagination,
+.projects-pagination,
+.instructors-pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.courses-pagination .swiper-pagination-bullet,
+.projects-pagination .swiper-pagination-bullet,
+.instructors-pagination .swiper-pagination-bullet {
+  width: 7px;
+  height: 7px;
+  margin: 0 !important;
+  opacity: 1;
+  background: #d8d1ca;
+  transition: all 0.3s ease;
+}
+
+.courses-pagination .swiper-pagination-bullet-active,
+.projects-pagination .swiper-pagination-bullet-active,
+.instructors-pagination .swiper-pagination-bullet-active {
+  width: 24px;
+  border-radius: 999px;
+  background: var(--primary-color);
+}
