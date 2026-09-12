@@ -4,28 +4,29 @@ import {
   UsersRound,
 } from "lucide-react";
 
-import { useTranslation } from "react-i18next";
 import { useReveal } from "../../hooks/useReveal";
 
 const WhyLearn = () => {
-  const { t } = useTranslation();
   const { ref: sectionRef, visible } = useReveal<HTMLElement>();
 
   const features = [
     {
       icon: BookOpen,
-      title: t("about.features.practical.title"),
-      description: t("about.features.practical.description"),
+      title: "Practical Learning",
+      description:
+        "Learn through practical concepts, real-world examples, and hands-on experiences that help you turn knowledge into useful skills.",
     },
     {
       icon: Layers3,
-      title: t("about.features.structured.title"),
-      description: t("about.features.structured.description"),
+      title: "Structured Learning",
+      description:
+        "Follow clear and organized learning paths designed to help you build your skills step by step and progress with confidence.",
     },
     {
       icon: UsersRound,
-      title: t("about.features.guidance.title"),
-      description: t("about.features.guidance.description"),
+      title: "Expert Guidance",
+      description:
+        "Learn from experienced instructors and gain guidance that helps you understand concepts, solve problems, and build better projects.",
     },
   ];
 
@@ -35,12 +36,11 @@ const WhyLearn = () => {
       className="relative overflow-hidden bg-[#F7F5F2] py-20 sm:py-24 lg:py-28"
     >
       {/* Professional Section Separator */}
-      <div className="absolute top-0 left-1/2 w-full max-w-7xl -translate-x-1/2 px-5 sm:px-8 lg:px-8">
+      <div className="absolute left-1/2 top-0 w-full max-w-7xl -translate-x-1/2 px-5 sm:px-8 lg:px-8">
         <div className="h-px w-full bg-[#D8D1CA]" />
       </div>
 
       <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-8">
-
         {/* SECTION HEADING */}
         <div
           className={`
@@ -64,19 +64,20 @@ const WhyLearn = () => {
               sm:text-sm
             "
           >
-            {t("about.badge")}
+            Why Learn With Us
           </span>
 
           {/* Heading */}
           <h2 className="mt-5 text-3xl font-bold leading-tight tracking-tight text-[#292725] sm:text-4xl lg:text-5xl">
-            {t("about.title")}
+            Learn With Purpose
             <br className="hidden sm:block" />
-            {t("about.titleHighlight")}
+            Build With Confidence
           </h2>
 
           {/* Description */}
           <p className="mt-5 text-base leading-7 text-[#77716B] sm:text-lg">
-            {t("about.description")}
+            Build practical skills through structured learning, real-world
+            projects, and guidance designed to help you grow professionally.
           </p>
         </div>
 

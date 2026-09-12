@@ -1,12 +1,10 @@
 import { ArrowUpRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 import contactHeroImage from "../../assets/images/contact-hero.jpeg";
 import { useReveal } from "../../hooks/useReveal";
 
 const ContactHero = () => {
   const { ref: heroRef, visible } = useReveal<HTMLElement>();
-  const { t } = useTranslation();
 
   return (
     <section
@@ -68,7 +66,7 @@ const ContactHero = () => {
             <span className="h-2 w-2 rounded-full bg-[var(--primary-color)]" />
 
             <span className="font-medium uppercase tracking-[0.16em]">
-              {t("contact.hero.badge")}
+              Get In Touch
             </span>
           </div>
 
@@ -93,11 +91,12 @@ const ContactHero = () => {
               }
             `}
           >
-            {t("contact.hero.title")}
+            Let&apos;s Start a
+
             <br />
 
             <span className="text-[var(--primary-color)]">
-              {t("contact.hero.titleHighlight")}
+              Conversation
             </span>
           </h1>
 
@@ -122,7 +121,9 @@ const ContactHero = () => {
               }
             `}
           >
-            {t("contact.hero.description")}
+            Have a question, idea, or project in mind?
+            Get in touch and let&apos;s explore how we can
+            turn your ideas into something meaningful.
           </p>
 
           {/* ================= BUTTON ================= */}
@@ -166,7 +167,7 @@ const ContactHero = () => {
                 sm:text-base
               "
             >
-              {t("contact.hero.button")}
+              Send a Message
 
               <ArrowUpRight size={17} />
             </a>
@@ -196,7 +197,7 @@ const ContactHero = () => {
             <span className="h-px w-8 bg-white/40" />
 
             <span>
-              {t("contact.hero.trust")}
+              We&apos;d love to hear from you.
             </span>
           </div>
 

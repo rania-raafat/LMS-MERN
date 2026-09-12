@@ -1,45 +1,62 @@
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
-import axios from "axios";
+
 import {
   useForm,
   type SubmitHandler,
 } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from "react-i18next";
 
 import {
   contactSchema,
   type ContactSchemaData,
 } from "../../schemas/contactSchema";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/contacts`;
+import { createContact } from "../../services/contactApi";
+
+// =====================================================
+// CONTACT SCHEMA
+// =====================================================
+
+const schema = contactSchema();
+
+// =====================================================
+// COMPONENT
+// =====================================================
 
 const ContactForm = () => {
-  const { t, i18n } = useTranslation();
+  // ===================================================
+  // SERVER STATES
+  // ===================================================
 
-  const [serverMessage, setServerMessage] = useState("");
-  const [serverError, setServerError] = useState("");
+  const [serverMessage, setServerMessage] =
+    useState("");
 
-  const messageTimerRef = useRef<ReturnType<
-    typeof setTimeout
-  > | null>(null);
+  const [serverError, setServerError] =
+    useState("");
 
-  // Create the schema using the current language
-  const schema = useMemo(
-    () => contactSchema(t),
-    [t, i18n.language]
-  );
+  // ===================================================
+  // MESSAGE TIMER
+  // ===================================================
+
+  const messageTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(
+      null
+    );
+
+  // ===================================================
+  // REACT HOOK FORM
+  // ===================================================
 
   const {
     register,
     handleSubmit,
     reset,
-    trigger,
+
     formState: {
       errors,
       isSubmitting,
@@ -49,32 +66,10 @@ const ContactForm = () => {
     mode: "onBlur",
   });
 
-  /*
-   * Keep the latest errors in a ref.
-   * This allows us to check whether there are
-   * validation errors without putting `errors`
-   * inside the language-change effect dependencies.
-   */
-  const errorsRef = useRef(errors);
+  // ===================================================
+  // CLEANUP TIMER
+  // ===================================================
 
-  useEffect(() => {
-    errorsRef.current = errors;
-  }, [errors]);
-
-  /*
-   * Re-validate only when the language changes.
-   *
-   * If the user already has validation errors,
-   * they will immediately be translated without
-   * requiring another submit.
-   */
-  useEffect(() => {
-    if (Object.keys(errorsRef.current).length > 0) {
-      void trigger();
-    }
-  }, [i18n.language, trigger]);
-
-  // Clean up timer when component unmounts
   useEffect(() => {
     return () => {
       if (messageTimerRef.current) {
@@ -83,64 +78,102 @@ const ContactForm = () => {
     };
   }, []);
 
-  const onSubmit: SubmitHandler<ContactSchemaData> = async (
-    data
-  ) => {
+  // ===================================================
+  // SUBMIT
+  // ===================================================
+
+  const onSubmit: SubmitHandler<
+    ContactSchemaData
+  > = async (data) => {
+    // -----------------------------------------------
     // Clear previous messages
+    // -----------------------------------------------
+
     setServerMessage("");
     setServerError("");
 
+    // -----------------------------------------------
     // Clear previous timer
+    // -----------------------------------------------
+
     if (messageTimerRef.current) {
       clearTimeout(messageTimerRef.current);
     }
 
+    // -----------------------------------------------
+    // Send contact message
+    // -----------------------------------------------
+
     try {
-      const response = await axios.post(
-        API_URL,
-        data
+      await createContact({
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+      });
+
+      // ---------------------------------------------
+      // Success
+      // ---------------------------------------------
+
+      setServerMessage(
+        "Your message has been sent successfully. We will get back to you soon."
       );
 
-      if (response.data.success) {
-        setServerMessage(
-          t("contact.form.success")
-        );
+      // ---------------------------------------------
+      // Reset form
+      // ---------------------------------------------
 
-        reset();
+      reset();
 
-        // Hide success message after 7 seconds
-        messageTimerRef.current = setTimeout(() => {
-          setServerMessage("");
-        }, 7000);
-      }
+      // ---------------------------------------------
+      // Hide success message after 7 seconds
+      // ---------------------------------------------
+
+      messageTimerRef.current = setTimeout(() => {
+        setServerMessage("");
+      }, 7000);
     } catch (error) {
-      let message = t("contact.form.error");
+      // ---------------------------------------------
+      // Default error message
+      // ---------------------------------------------
 
-      if (axios.isAxiosError(error)) {
-        message =
-          error.response?.data?.message ||
-          message;
+      let message =
+        "Something went wrong while sending your message. Please try again.";
+
+      // ---------------------------------------------
+      // API error
+      // ---------------------------------------------
+
+      if (error instanceof Error && error.message) {
+        message = error.message;
       }
 
       setServerError(message);
 
+      // ---------------------------------------------
       // Hide error message after 7 seconds
+      // ---------------------------------------------
+
       messageTimerRef.current = setTimeout(() => {
         setServerError("");
       }, 7000);
     }
   };
 
-  /*
-   * Keep this wrapper because passing
-   * handleSubmit(onSubmit) directly to onSubmit
-   * can trigger the React hooks/refs ESLint rule.
-   */
+  // ===================================================
+  // FORM SUBMIT WRAPPER
+  // ===================================================
+
   const handleFormSubmit = (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     void handleSubmit(onSubmit)(event);
   };
+
+  // ===================================================
+  // UI
+  // ===================================================
 
   return (
     <section
@@ -149,43 +182,52 @@ const ContactForm = () => {
     >
       <div className="mx-auto max-w-3xl">
 
-        {/* ================= HEADER ================= */}
+        {/* =========================================
+            HEADER
+        ========================================== */}
+
         <div className="mb-10 text-center">
           <span className="mb-3 inline-block text-sm font-medium uppercase tracking-[0.18em] text-[var(--primary-color)]">
-            {t("contact.form.badge")}
+            Get In Touch
           </span>
 
           <h2 className="text-3xl font-semibold tracking-tight text-[var(--main-color)] sm:text-4xl">
-            {t("contact.form.title")}
+            Let&apos;s Start a Conversation
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#77716b] sm:text-base">
-            {t("contact.form.description")}
+            Have a question, idea, or project in mind?
+            Send us a message and we&apos;ll get back to
+            you as soon as possible.
           </p>
         </div>
 
-        {/* ================= FORM ================= */}
+        {/* =========================================
+            FORM
+        ========================================== */}
+
         <form
           onSubmit={handleFormSubmit}
           noValidate
           className="rounded-[28px] border border-[#e4ded8] bg-white/60 p-6 shadow-sm backdrop-blur-md sm:p-8"
         >
 
-          {/* ================= NAME ================= */}
+          {/* =======================================
+              NAME
+          ======================================== */}
+
           <div className="mb-6">
             <label
               htmlFor="name"
               className="mb-2 block text-sm font-medium text-[var(--main-color)]"
             >
-              {t("contact.form.name")}
+              Full Name
             </label>
 
             <input
               id="name"
               type="text"
-              placeholder={t(
-                "contact.form.namePlaceholder"
-              )}
+              placeholder="Enter your full name"
               autoComplete="name"
               {...register("name")}
               className={`w-full rounded-2xl border bg-white/70 px-4 py-3.5 text-sm text-[var(--main-color)] outline-none transition placeholder:text-[#a49d96] focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--primary-color)]/10 ${
@@ -202,21 +244,22 @@ const ContactForm = () => {
             )}
           </div>
 
-          {/* ================= EMAIL ================= */}
+          {/* =======================================
+              EMAIL
+          ======================================== */}
+
           <div className="mb-6">
             <label
               htmlFor="email"
               className="mb-2 block text-sm font-medium text-[var(--main-color)]"
             >
-              {t("contact.form.email")}
+              Email Address
             </label>
 
             <input
               id="email"
               type="email"
-              placeholder={t(
-                "contact.form.emailPlaceholder"
-              )}
+              placeholder="Enter your email address"
               autoComplete="email"
               {...register("email")}
               className={`w-full rounded-2xl border bg-white/70 px-4 py-3.5 text-sm text-[var(--main-color)] outline-none transition placeholder:text-[#a49d96] focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--primary-color)]/10 ${
@@ -233,21 +276,22 @@ const ContactForm = () => {
             )}
           </div>
 
-          {/* ================= SUBJECT ================= */}
+          {/* =======================================
+              SUBJECT
+          ======================================== */}
+
           <div className="mb-6">
             <label
               htmlFor="subject"
               className="mb-2 block text-sm font-medium text-[var(--main-color)]"
             >
-              {t("contact.form.subject")}
+              Subject
             </label>
 
             <input
               id="subject"
               type="text"
-              placeholder={t(
-                "contact.form.subjectPlaceholder"
-              )}
+              placeholder="What would you like to talk about?"
               {...register("subject")}
               className={`w-full rounded-2xl border bg-white/70 px-4 py-3.5 text-sm text-[var(--main-color)] outline-none transition placeholder:text-[#a49d96] focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--primary-color)]/10 ${
                 errors.subject
@@ -263,18 +307,21 @@ const ContactForm = () => {
             )}
           </div>
 
-          {/* ================= MESSAGE ================= */}
+          {/* =======================================
+              MESSAGE
+          ======================================== */}
+
           <div className="mb-6">
             <div className="mb-2 flex items-center justify-between">
               <label
                 htmlFor="message"
                 className="block text-sm font-medium text-[var(--main-color)]"
               >
-                {t("contact.form.message")}
+                Message
               </label>
 
               <span className="text-xs text-[#8a827a]">
-                {t("contact.form.maxCharacters")}
+                Maximum 1000 characters
               </span>
             </div>
 
@@ -282,9 +329,7 @@ const ContactForm = () => {
               id="message"
               rows={6}
               maxLength={1000}
-              placeholder={t(
-                "contact.form.messagePlaceholder"
-              )}
+              placeholder="Write your message here..."
               {...register("message")}
               className={`w-full resize-none rounded-2xl border bg-white/70 px-4 py-3.5 text-sm text-[var(--main-color)] outline-none transition placeholder:text-[#a49d96] focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--primary-color)]/10 ${
                 errors.message
@@ -300,31 +345,47 @@ const ContactForm = () => {
             )}
           </div>
 
-          {/* ================= SUCCESS MESSAGE ================= */}
+          {/* =======================================
+              SUCCESS MESSAGE
+          ======================================== */}
+
           {serverMessage && (
-            <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            <div
+              role="status"
+              aria-live="polite"
+              className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+            >
               {serverMessage}
             </div>
           )}
 
-          {/* ================= ERROR MESSAGE ================= */}
+          {/* =======================================
+              ERROR MESSAGE
+          ======================================== */}
+
           {serverError && (
-            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+            >
               {serverError}
             </div>
           )}
 
-          {/* ================= SUBMIT ================= */}
+          {/* =======================================
+              SUBMIT
+          ======================================== */}
+
           <button
             type="submit"
             disabled={isSubmitting}
             className="w-full rounded-full bg-[var(--primary-color)] px-6 py-3.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting
-              ? t("contact.form.sending")
-              : t("contact.form.send")}
+              ? "Sending..."
+              : "Send Message"}
           </button>
-
         </form>
       </div>
     </section>

@@ -1,37 +1,33 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 import logo from "../assets/images/lms-logo.webp";
-import LanguageSwitcher from "./LanguageSwitcher";
 
 const links = [
   {
-    key: "home",
+    label: "Home",
     path: "/",
   },
   {
-    key: "about",
+    label: "About",
     path: "/about",
   },
   {
-    key: "courses",
+    label: "Courses",
     path: "/courses",
   },
   {
-    key: "paths",
+    label: "Learning Paths",
     path: "/learning-paths",
   },
   {
-    key: "contact",
+    label: "Contact",
     path: "/contact",
   },
 ];
 
 export default function Navbar() {
-  const { t } = useTranslation();
-
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -105,7 +101,7 @@ export default function Navbar() {
         >
           <nav className="flex items-center justify-between">
             {/* ================= LOGO ================= */}
-            <Link to="/" className="flex items-center gap-3 shrink-0">
+            <Link to="/" className="flex shrink-0 items-center gap-3">
               <img
                 src={logo}
                 alt="LMS Logo"
@@ -118,22 +114,22 @@ export default function Navbar() {
             </Link>
 
             {/* ================= DESKTOP NAVIGATION ================= */}
-            <div className="hidden md:flex items-center gap-7 lg:gap-8">
+            <div className="hidden items-center gap-7 md:flex lg:gap-8">
               {links.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   className="
+                    group
                     relative
                     h-6
                     overflow-hidden
-                    group
-                    font-medium
                     text-sm
+                    font-medium
                     text-[var(--main-color)]
                   "
                 >
-                  {/* First text */}
+                  {/* Default text */}
                   <span
                     className="
                       block
@@ -143,7 +139,7 @@ export default function Navbar() {
                       group-hover:-translate-y-full
                     "
                   >
-                    {t(`nav.${link.key}`)}
+                    {link.label}
                   </span>
 
                   {/* Hover text */}
@@ -160,17 +156,14 @@ export default function Navbar() {
                       group-hover:-translate-y-full
                     "
                   >
-                    {t(`nav.${link.key}`)}
+                    {link.label}
                   </span>
                 </Link>
               ))}
             </div>
 
             {/* ================= DESKTOP ACTIONS ================= */}
-            <div className="hidden md:flex items-center gap-3">
-              {/* Language */}
-              <LanguageSwitcher />
-
+            <div className="hidden items-center gap-3 md:flex">
               {/* Login */}
               <Link
                 to="/login"
@@ -185,7 +178,7 @@ export default function Navbar() {
                   hover:bg-white/70
                 "
               >
-                {t("nav.login")}
+                Login
               </Link>
 
               {/* CTA */}
@@ -206,7 +199,7 @@ export default function Navbar() {
                   hover:shadow-[#D97B66]/20
                 "
               >
-                {t("nav.startLearning")}
+                Start Learning
               </Link>
             </div>
 
@@ -348,34 +341,18 @@ export default function Navbar() {
                   hover:text-[var(--primary-color)]
                 "
               >
-                {t(`nav.${link.key}`)}
+                {link.label}
               </Link>
             ))}
           </div>
 
-          {/* Extra Mobile Content */}
+          {/* Account */}
           <div className="mt-8">
             <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[#8a827a]">
-              {t("nav.account")}
+              Account
             </p>
 
             <div className="flex flex-col gap-3">
-              {/* Language */}
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-center
-                  rounded-full
-                  border
-                  border-[#d8d1ca]
-                  bg-white/60
-                  py-3
-                "
-              >
-                <LanguageSwitcher />
-              </div>
-
               {/* Login */}
               <Link
                 to="/login"
@@ -393,7 +370,7 @@ export default function Navbar() {
                   hover:bg-white
                 "
               >
-                {t("nav.login")}
+                Login
               </Link>
 
               {/* CTA */}
@@ -413,15 +390,16 @@ export default function Navbar() {
                   hover:bg-[#be553e]
                 "
               >
-                {t("nav.startLearning")}
+                Start Learning
               </Link>
             </div>
           </div>
 
-          {/* Small description */}
+          {/* Small Description */}
           <div className="mt-10 rounded-2xl bg-white/60 p-5">
             <p className="text-sm leading-6 text-[#77716b]">
-              {t("hero.description")}
+              Learn practical skills, build real projects, and grow with
+              confidence through structured learning.
             </p>
           </div>
         </div>

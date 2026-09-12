@@ -1,16 +1,11 @@
 import { ArrowUpRight } from "lucide-react";
-import {
-  FaGithub,
-  FaInstagram,
-  FaLinkedin,
-} from "react-icons/fa6";
+import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+
 import { useReveal } from "../hooks/useReveal";
 import Logo from "../assets/images/lms-logo.webp";
 
 const Footer = () => {
-  const { t } = useTranslation();
   const { ref: footerRef, visible } = useReveal<HTMLElement>();
 
   return (
@@ -26,17 +21,13 @@ const Footer = () => {
       {/* BACKGROUND GLOW */}
       <div
         className={`pointer-events-none absolute -right-40 top-16 h-80 w-80 rounded-full bg-[var(--primary-color)] blur-3xl transition-all duration-[1500ms] ${
-          visible
-            ? "scale-100 opacity-[0.05]"
-            : "scale-50 opacity-0"
+          visible ? "scale-100 opacity-[0.05]" : "scale-50 opacity-0"
         }`}
       />
 
       <div
         className={`pointer-events-none absolute -left-40 bottom-10 h-80 w-80 rounded-full bg-[var(--secondary-color)] blur-3xl transition-all duration-[1500ms] ${
-          visible
-            ? "scale-100 opacity-[0.04]"
-            : "scale-50 opacity-0"
+          visible ? "scale-100 opacity-[0.04]" : "scale-50 opacity-0"
         }`}
       />
 
@@ -44,14 +35,11 @@ const Footer = () => {
       <div className="relative mx-auto w-full max-w-7xl px-5 pb-8 pt-16 sm:px-8 sm:pb-10 sm:pt-20 lg:px-8">
         <div
           className={`transition-all duration-1000 ease-out ${
-            visible
-              ? "translate-y-0 opacity-100"
-              : "translate-y-8 opacity-0"
+            visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}
         >
           {/* FOOTER GRID */}
           <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr] lg:gap-12">
-
             {/* BRAND */}
             <div className="max-w-sm">
               <Link
@@ -75,7 +63,8 @@ const Footer = () => {
               </Link>
 
               <p className="mt-6 max-w-xs text-sm leading-7 text-[var(--main-color)]/55">
-                {t("footer.description")}
+                Learn practical skills, build real projects, and grow with
+                confidence through structured learning.
               </p>
 
               {/* SOCIAL ICONS */}
@@ -136,7 +125,7 @@ const Footer = () => {
             {/* PLATFORM */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--main-color)]">
-                {t("footer.platform")}
+                Platform
               </h3>
 
               <ul className="mt-5 space-y-3">
@@ -145,7 +134,7 @@ const Footer = () => {
                     to="/courses"
                     className="text-sm text-[var(--main-color)]/55 transition-colors duration-300 hover:text-[var(--primary-color)]"
                   >
-                    {t("footer.courses")}
+                    Courses
                   </Link>
                 </li>
 
@@ -154,17 +143,16 @@ const Footer = () => {
                     to="/learning-paths"
                     className="text-sm text-[var(--main-color)]/55 transition-colors duration-300 hover:text-[var(--primary-color)]"
                   >
-                    {t("footer.learningPaths")}
+                    Learning Paths
                   </Link>
                 </li>
-
               </ul>
             </div>
 
             {/* COMPANY */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--main-color)]">
-                {t("footer.company")}
+                Company
               </h3>
 
               <ul className="mt-5 space-y-3">
@@ -173,7 +161,7 @@ const Footer = () => {
                     to="/about"
                     className="text-sm text-[var(--main-color)]/55 transition-colors duration-300 hover:text-[var(--primary-color)]"
                   >
-                    {t("footer.about")}
+                    About
                   </Link>
                 </li>
 
@@ -182,17 +170,16 @@ const Footer = () => {
                     to="/contact"
                     className="text-sm text-[var(--main-color)]/55 transition-colors duration-300 hover:text-[var(--primary-color)]"
                   >
-                    {t("footer.contact")}
+                    Contact
                   </Link>
                 </li>
-
               </ul>
             </div>
 
             {/* RESOURCES */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--main-color)]">
-                {t("footer.resources")}
+                Resources
               </h3>
 
               <ul className="mt-5 space-y-3">
@@ -201,8 +188,7 @@ const Footer = () => {
                     to="/register"
                     className="group inline-flex items-center gap-1.5 text-sm text-[var(--main-color)]/55 transition-colors duration-300 hover:text-[var(--primary-color)]"
                   >
-                    {t("footer.startLearning")}
-
+                    Start Learning
                     <ArrowUpRight
                       size={13}
                       strokeWidth={1.8}
@@ -220,14 +206,14 @@ const Footer = () => {
           {/* BOTTOM BAR */}
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-xs text-[var(--main-color)]/40">
-              {t("footer.copyright")}
+              © {new Date().getFullYear()} LMS. All rights reserved.
             </p>
 
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] text-[var(--main-color)]/30">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--primary-color)]" />
 
               <span className="uppercase tracking-[0.20em] text-black">
-                {t("footer.tagline")}
+                Learn • Build • Grow
               </span>
             </div>
           </div>
