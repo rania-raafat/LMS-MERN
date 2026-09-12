@@ -6,24 +6,32 @@ const contactSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 2,
+      maxlength: 50,
     },
 
     email: {
       type: String,
       required: true,
       trim: true,
+      lowercase: true,
+      maxlength: 254,
     },
 
     subject: {
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
+      maxlength: 100,
     },
 
     message: {
       type: String,
       required: true,
       trim: true,
+      minlength: 10,
+      maxlength: 1000,
     },
   },
   {
@@ -31,7 +39,6 @@ const contactSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model(
-  "Contact",
-  contactSchema
-);
+const Contact = mongoose.model("Contact", contactSchema);
+
+export default Contact;

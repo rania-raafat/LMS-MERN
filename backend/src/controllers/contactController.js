@@ -10,112 +10,249 @@ export const createContact = async (req, res) => {
       message,
     } = req.body;
 
-    // ================= VALIDATION =================
+    // =====================================================
+    // REQUIRED FIELDS VALIDATION
+    // =====================================================
 
-    if (
-      !name?.trim() ||
-      !email?.trim() ||
-      !subject?.trim() ||
-      !message?.trim()
-    ) {
+    if (!name?.trim()) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "Name is required",
+      });
+    }
+
+    if (!email?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    if (!subject?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject is required",
+      });
+    }
+
+    if (!message?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Message is required",
+      });
+    }
+
+    // =====================================================
+    // CLEAN DATA
+    // =====================================================
+
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanSubject = subject.trim();
+    const cleanMessage = message.trim();
+
+    // =====================================================
+    // NAME VALIDATION
+    // =====================================================
+
+    if (cleanName.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must be at least 2 characters",
+      });
+    }
+
+    if (cleanName.length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must not exceed 50 characters",
+      });
+    }
+
+    const nameRegex = /^[\p{L}\p{M}\s'-]+$/u;
+
+    if (!nameRegex.test(cleanName)) {
+      return res.status(400).json({
+        success: false,
+        message: "Name contains invalid characters",
+      });
+    }
+
+    // =====================================================
+    // EMAIL VALIDATION
+    // =====================================================
+
+    if (cleanEmail.length > 254) {
+      return res.status(400).json({
+        success: false,
+        message: "Email must not exceed 254 characters",
       });
     }
 
     const emailRegex =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email.trim())) {
+    if (!emailRegex.test(cleanEmail)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid email",
       });
     }
 
-    // ================= SAVE TO DATABASE =================
+    // =====================================================
+    // SUBJECT VALIDATION
+    // =====================================================
+
+    if (cleanSubject.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject must be at least 3 characters",
+      });
+    }
+
+    if (cleanSubject.length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject must not exceed 100 characters",
+      });
+    }
+
+    // =====================================================
+    // MESSAGE VALIDATION
+    // =====================================================
+
+    if (cleanMessage.length < 10) {
+      return res.status(400).json({
+        success: false,
+        message: "Message must be at least 10 characters",
+      });
+    }
+
+    if (cleanMessage.length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "Message must not exceed 1000 characters",
+      });
+    }
+
+    // =====================================================
+    // SAVE TO DATABASE
+    // =====================================================
 
     const contact = await Contact.create({
-      name: name.trim(),
-      email: email.trim(),
-      subject: subject.trim(),
-      message: message.trim(),
+      name: cleanName,
+      email: cleanEmail,
+      subject: cleanSubject,
+      message: cleanMessage,
     });
 
-    // ================= SEND THANK YOU TO SENDER =================
+    // =====================================================
+    // SEND EMAILS
+    // =====================================================
 
-    await sendEmail(
-      email.trim(),
-      "LMS - We received your inquiry",
-      `
-        <h2>Thank you for contacting LMS</h2>
+    try {
+      // ---------------------------------------------------
+      // THANK YOU EMAIL TO USER
+      // ---------------------------------------------------
 
-        <p>Hello ${name.trim()},</p>
+      await sendEmail(
+        cleanEmail,
+        "LMS - We received your inquiry",
+        `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>Thank you for contacting LMS</h2>
 
-        <p>
-          We have received your inquiry successfully.
-        </p>
+            <p>Hello ${cleanName},</p>
 
-        <p>
-          <strong>Subject:</strong> ${subject.trim()}
-        </p>
+            <p>
+              We have received your inquiry successfully.
+            </p>
 
-        <p>
-          Our team will get back to you soon.
-        </p>
+            <p>
+              <strong>Subject:</strong>
+              ${cleanSubject}
+            </p>
 
-        <p>
-          Best regards,<br />
-          LMS Team
-        </p>
-      `
-    );
+            <p>
+              Our team will get back to you soon.
+            </p>
 
-    // ================= SEND NOTIFICATION TO OWNER =================
+            <p>
+              Best regards,<br />
+              LMS Team
+            </p>
+          </div>
+        `
+      );
 
-    await sendEmail(
-      "raniaraafat421@gmail.com",
-      `New Inquiry - ${subject.trim()}`,
-      `
-        <h2>New Inquiry Received</h2>
+      // ---------------------------------------------------
+      // NOTIFICATION EMAIL TO OWNER
+      // ---------------------------------------------------
 
-        <p>
-          You have received a new message through the LMS website.
-        </p>
+      await sendEmail(
+        "raniaraafat421@gmail.com",
+        `New Inquiry - ${cleanSubject}`,
+        `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>New Inquiry Received</h2>
 
-        <hr />
+            <p>
+              You have received a new message
+              through the LMS website.
+            </p>
 
-        <p>
-          <strong>Name:</strong> ${name.trim()}
-        </p>
+            <hr />
 
-        <p>
-          <strong>Email:</strong> ${email.trim()}
-        </p>
+            <p>
+              <strong>Name:</strong>
+              ${cleanName}
+            </p>
 
-        <p>
-          <strong>Subject:</strong> ${subject.trim()}
-        </p>
+            <p>
+              <strong>Email:</strong>
+              ${cleanEmail}
+            </p>
 
-        <p>
-          <strong>Message:</strong>
-        </p>
+            <p>
+              <strong>Subject:</strong>
+              ${cleanSubject}
+            </p>
 
-        <p>
-          ${message.trim()}
-        </p>
+            <p>
+              <strong>Message:</strong>
+            </p>
 
-        <hr />
+            <p>
+              ${cleanMessage}
+            </p>
 
-        <p>
-          <strong>Received:</strong>
-          ${new Date().toLocaleString()}
-        </p>
-      `
-    );
+            <hr />
 
-    // ================= SUCCESS RESPONSE =================
+            <p>
+              <strong>Received:</strong>
+              ${new Date().toLocaleString()}
+            </p>
+          </div>
+        `
+      );
+    } catch (emailError) {
+      /*
+       * The inquiry has already been successfully
+       * stored in MongoDB.
+       *
+       * Email failure should NOT make the API
+       * report the entire inquiry as failed.
+       */
+
+      console.error(
+        "Contact Email Error:",
+        emailError
+      );
+    }
+
+    // =====================================================
+    // SUCCESS RESPONSE
+    // =====================================================
 
     return res.status(201).json({
       success: true,
@@ -123,14 +260,41 @@ export const createContact = async (req, res) => {
       data: contact,
     });
   } catch (error) {
-    console.error("Contact Error:", error);
+    console.error(
+      "Create Contact Error:",
+      error
+    );
+
+    // =====================================================
+    // MONGOOSE VALIDATION ERROR
+    // =====================================================
+
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(
+        error.errors
+      ).map((err) => err.message);
+
+      return res.status(400).json({
+        success: false,
+        message: validationErrors.join(", "),
+      });
+    }
+
+    // =====================================================
+    // SERVER ERROR
+    // =====================================================
 
     return res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message:
+        "Something went wrong. Please try again later.",
     });
   }
 };
+
+// =========================================================
+// GET ALL CONTACTS
+// =========================================================
 
 export const getContacts = async (req, res) => {
   try {
@@ -144,11 +308,15 @@ export const getContacts = async (req, res) => {
       data: contacts,
     });
   } catch (error) {
-    console.error("Get Contacts Error:", error);
+    console.error(
+      "Get Contacts Error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message:
+        "Something went wrong. Please try again later.",
     });
   }
 };
