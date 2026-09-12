@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      maxlength: [100, "Email cannot exceed 100 characters"],
+      maxlength: [254, "Email cannot exceed 254 characters"],
       match: [
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         "Please provide a valid email address",
@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
+      maxlength: [128, "Password cannot exceed 128 characters"],
+      match: [
+        /^(?=.*[A-Za-z])(?=.*\d).{6,128}$/,
+        "Password must contain at least one letter and one number",
+      ],
     },
 
     role: {
@@ -45,7 +50,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.model("User", userSchema);
