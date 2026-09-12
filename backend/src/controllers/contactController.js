@@ -1,5 +1,10 @@
 import Contact from "../models/Contact.js";
+
 import { sendEmail } from "../config/email.js";
+
+// =========================================================
+// CREATE CONTACT
+// =========================================================
 
 export const createContact = async (req, res) => {
   try {
@@ -47,7 +52,8 @@ export const createContact = async (req, res) => {
     // =====================================================
 
     const cleanName = name.trim();
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail =
+      email.trim().toLowerCase();
     const cleanSubject = subject.trim();
     const cleanMessage = message.trim();
 
@@ -58,23 +64,27 @@ export const createContact = async (req, res) => {
     if (cleanName.length < 2) {
       return res.status(400).json({
         success: false,
-        message: "Name must be at least 2 characters",
+        message:
+          "Name must be at least 2 characters",
       });
     }
 
     if (cleanName.length > 50) {
       return res.status(400).json({
         success: false,
-        message: "Name must not exceed 50 characters",
+        message:
+          "Name must not exceed 50 characters",
       });
     }
 
-    const nameRegex = /^[\p{L}\p{M}\s'-]+$/u;
+    const nameRegex =
+      /^[\p{L}\p{M}\s'-]+$/u;
 
     if (!nameRegex.test(cleanName)) {
       return res.status(400).json({
         success: false,
-        message: "Name contains invalid characters",
+        message:
+          "Name contains invalid characters",
       });
     }
 
@@ -85,7 +95,8 @@ export const createContact = async (req, res) => {
     if (cleanEmail.length > 254) {
       return res.status(400).json({
         success: false,
-        message: "Email must not exceed 254 characters",
+        message:
+          "Email must not exceed 254 characters",
       });
     }
 
@@ -95,7 +106,8 @@ export const createContact = async (req, res) => {
     if (!emailRegex.test(cleanEmail)) {
       return res.status(400).json({
         success: false,
-        message: "Please enter a valid email",
+        message:
+          "Please enter a valid email",
       });
     }
 
@@ -106,14 +118,16 @@ export const createContact = async (req, res) => {
     if (cleanSubject.length < 3) {
       return res.status(400).json({
         success: false,
-        message: "Subject must be at least 3 characters",
+        message:
+          "Subject must be at least 3 characters",
       });
     }
 
     if (cleanSubject.length > 100) {
       return res.status(400).json({
         success: false,
-        message: "Subject must not exceed 100 characters",
+        message:
+          "Subject must not exceed 100 characters",
       });
     }
 
@@ -124,14 +138,16 @@ export const createContact = async (req, res) => {
     if (cleanMessage.length < 10) {
       return res.status(400).json({
         success: false,
-        message: "Message must be at least 10 characters",
+        message:
+          "Message must be at least 10 characters",
       });
     }
 
     if (cleanMessage.length > 1000) {
       return res.status(400).json({
         success: false,
-        message: "Message must not exceed 1000 characters",
+        message:
+          "Message must not exceed 1000 characters",
       });
     }
 
@@ -182,7 +198,7 @@ export const createContact = async (req, res) => {
               LMS Team
             </p>
           </div>
-        `
+        `,
       );
 
       // ---------------------------------------------------
@@ -233,7 +249,7 @@ export const createContact = async (req, res) => {
               ${new Date().toLocaleString()}
             </p>
           </div>
-        `
+        `,
       );
     } catch (emailError) {
       /*
@@ -246,7 +262,7 @@ export const createContact = async (req, res) => {
 
       console.error(
         "Contact Email Error:",
-        emailError
+        emailError,
       );
     }
 
@@ -256,27 +272,33 @@ export const createContact = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Inquiry submitted successfully",
+      message:
+        "Inquiry submitted successfully",
       data: contact,
     });
   } catch (error) {
     console.error(
       "Create Contact Error:",
-      error
+      error,
     );
 
     // =====================================================
     // MONGOOSE VALIDATION ERROR
     // =====================================================
 
-    if (error.name === "ValidationError") {
-      const validationErrors = Object.values(
-        error.errors
-      ).map((err) => err.message);
+    if (
+      error instanceof Error &&
+      error.name === "ValidationError"
+    ) {
+      const validationErrors =
+        Object.values(error.errors).map(
+          (err) => err.message,
+        );
 
       return res.status(400).json({
         success: false,
-        message: validationErrors.join(", "),
+        message:
+          validationErrors.join(", "),
       });
     }
 
@@ -296,11 +318,15 @@ export const createContact = async (req, res) => {
 // GET ALL CONTACTS
 // =========================================================
 
-export const getContacts = async (req, res) => {
+export const getContacts = async (
+  req,
+  res,
+) => {
   try {
-    const contacts = await Contact.find().sort({
-      createdAt: -1,
-    });
+    const contacts =
+      await Contact.find().sort({
+        createdAt: -1,
+      });
 
     return res.status(200).json({
       success: true,
@@ -310,8 +336,86 @@ export const getContacts = async (req, res) => {
   } catch (error) {
     console.error(
       "Get Contacts Error:",
-      error
+      error,
     );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Something went wrong. Please try again later.",
+    });
+  }
+};
+
+// =========================================================
+// DELETE CONTACT
+// DELETE /api/contacts/:id
+// Protected - Owner only
+// =========================================================
+
+export const deleteContact = async (
+  req,
+  res,
+) => {
+  try {
+    const { id } = req.params;
+
+    // =====================================================
+    // FIND CONTACT
+    // =====================================================
+
+    const contact =
+      await Contact.findById(id);
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Contact message not found",
+      });
+    }
+
+    // =====================================================
+    // DELETE CONTACT
+    // =====================================================
+
+    await Contact.findByIdAndDelete(id);
+
+    // =====================================================
+    // SUCCESS RESPONSE
+    // =====================================================
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Contact message deleted successfully",
+      data: contact,
+    });
+  } catch (error) {
+    console.error(
+      "Delete Contact Error:",
+      error,
+    );
+
+    // =====================================================
+    // INVALID MONGODB ID
+    // =====================================================
+
+    if (
+      error instanceof Error &&
+      error.name ===
+        "CastError"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid contact ID",
+      });
+    }
+
+    // =====================================================
+    // SERVER ERROR
+    // =====================================================
 
     return res.status(500).json({
       success: false,
